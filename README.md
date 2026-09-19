@@ -13,10 +13,10 @@ Shared [Astro Starlight](https://starlight.astro.build/) theme for Almasix docum
 ## Install
 
 ```bash
-npm install github:almasix-dev/starlight-theme
-# or after npm publish:
-# npm install @almasix/starlight-theme
+npm install github:almasix-dev/starlight-theme#v0.1.0
 ```
+
+> npm registry publish for `@almasix/starlight-theme` needs org npm access (not configured in CI yet). Until then, install from GitHub as above.
 
 Peer deps: `@astrojs/starlight` ^0.42, `astro` ^5 or ^7, Node ≥ 22.
 
