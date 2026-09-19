@@ -10,18 +10,33 @@ Shared [Astro Starlight](https://starlight.astro.build/) theme for Almasix docum
 - Prev/next links with group breadcrumbs (`Tables · Columns · Overview`)
 - Theme cycle control + sidebar accordion + optional screenshot lightbox
 
+## Requirements
+
+- Node.js **≥ 22**
+- [`@astrojs/starlight`](https://www.npmjs.com/package/@astrojs/starlight) `^0.42`
+- [`astro`](https://www.npmjs.com/package/astro) `^5` or `^7`
+
 ## Install
 
 ```bash
 npm install @almasix/starlight-theme
 ```
 
-Peer deps: `@astrojs/starlight` ^0.42, `astro` ^5 or ^7, Node ≥ 22.
+Also install the peers if your project does not already have them:
 
-## Usage
+```bash
+npm install astro @astrojs/starlight
+```
+
+## Setup
+
+### 1. Register the plugin
+
+In `astro.config.mjs`, import the plugin and add it under Starlight `plugins`. Do **not** override `Header`, `PageFrame`, `Pagination`, `SiteTitle`, `ThemeSelect`, or `TwoColumnContent` — the theme owns those slots.
 
 ```js
-// astro.config.mjs
+// @ts-check
+import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import almasixTheme from '@almasix/starlight-theme';
 
@@ -29,76 +44,105 @@ export default defineConfig({
   integrations: [
     starlight({
       title: 'Orbit',
-      plugins: [
-        almasixTheme({
-          github: 'almasix-dev/almasix-orbit',
-          product: 'Orbit',
-          hubUrl: 'https://almasix.com',
-          // Optional — version switcher / banner stay in your repo:
-          headerExtras: './src/components/VersionSelect.astro',
-          pageBanner: './src/components/VersionBanner.astro',
-        }),
-      ],
       logo: {
         light: './src/assets/almasix-banner-light.svg',
         dark: './src/assets/almasix-banner-dark.svg',
         alt: 'Almasix',
         replacesTitle: true,
       },
-      // Put banners in public/ as almasix-banner-{light,dark}.svg
-      customCss: ['./src/styles/landing.css'], // site-specific only
-      // Do NOT re-declare Header/PageFrame/Pagination/… — the plugin owns those.
+      plugins: [
+        almasixTheme({
+          github: 'almasix-dev/almasix-orbit',
+          product: 'Orbit',
+          hubUrl: 'https://almasix.com',
+        }),
+      ],
+      // Site-specific CSS only — theme CSS is injected automatically.
+      customCss: ['./src/styles/landing.css'],
+      // Optional local overrides (Hero is fine; chrome slots are not):
+      components: {
+        Hero: './src/components/Hero.astro',
+      },
     }),
   ],
 });
 ```
 
-Serve brand banners from `public/almasix-banner-light.svg` and `public/almasix-banner-dark.svg`.
+Minimal config (defaults for `hubUrl`, lightbox, and sidebar accordion):
+
+```js
+plugins: [almasixTheme({ github: 'almasix-dev/your-repo', product: 'Docs' })],
+```
+
+### 2. Brand banners
+
+The site title renders logos from **`public/`** (so “Open image in new tab” works), while Starlight’s `logo` config still needs matching assets for layout/alt:
+
+| Role | Path |
+|------|------|
+| Light mode mark | `public/almasix-banner-light.svg` |
+| Dark mode mark | `public/almasix-banner-dark.svg` |
+| Starlight `logo.light` / `logo.dark` | e.g. `./src/assets/almasix-banner-*.svg` (same files copied or symlinked) |
+
+Use dual light/dark logos with `replacesTitle: true` and `alt: 'Almasix'`.
+
+### 3. Optional header extras and page banner
+
+Keep version switchers, deprecation banners, and other site-specific chrome in your docs repo. Point the plugin at them with project-relative paths:
+
+```js
+almasixTheme({
+  github: 'almasix-dev/almasix-orbit',
+  product: 'Orbit',
+  hubUrl: 'https://almasix.com',
+  headerExtras: './src/components/VersionSelect.astro', // after GitHub chip
+  pageBanner: './src/components/VersionBanner.astro',   // under header
+}),
+```
+
+If omitted, those slots render nothing.
+
+### 4. What the plugin configures for you
+
+| Concern | Behavior |
+|---------|----------|
+| Theme CSS | Prepended as `@almasix/starlight-theme/styles` |
+| Chrome components | The six slots listed above |
+| Code blocks | `gruvbox-dark-hard`, no light/dark theme switch on code |
+| Fonts | Google Fonts preconnect links (skipped if you already add them) |
+| Sidebar accordion | On by default (`sidebarAccordion: false` to disable) |
+| Screenshot lightbox | On by default (`lightbox: false` to disable) |
+
+Your `customCss`, `head`, and non-chrome `components` (e.g. `Hero`) are merged in after the theme.
 
 ## Options
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `github` | — | `owner/repo` for the header chip |
-| `product` | from `title` | Suffix next to the Almasix mark |
-| `hubUrl` | `https://almasix.com` | Wordmark link |
-| `headerExtras` | — | Project-relative Astro component after the chip |
+| `github` | — | `owner/repo` for the header chip (stars, forks, latest release) |
+| `product` | from Starlight `title` | Suffix next to the Almasix mark (`ORBIT`, `DOCS`, …) |
+| `hubUrl` | `https://almasix.com` | Wordmark link target |
+| `headerExtras` | — | Project-relative Astro component after the GitHub chip |
 | `pageBanner` | — | Project-relative Astro component under the header |
 | `lightbox` | `true` | Inject example-screenshot lightbox script |
-| `sidebarAccordion` | `true` | One open sidebar group at a time |
+| `sidebarAccordion` | `true` | Keep one sidebar group open at a time |
 
-## Publishing (npm Trusted Publishing)
+## Publishing (maintainers)
 
-Releases use [Trusted Publishing](https://docs.npmjs.com/trusted-publishers/) — no `NPM_TOKEN` in GitHub secrets. CI authenticates with a short-lived OIDC token.
+Releases use [Trusted Publishing](https://docs.npmjs.com/trusted-publishers/) — no `NPM_TOKEN` secret. CI authenticates with a short-lived OIDC token.
 
-### One-time: configure npmjs.com
+**npmjs.com (one-time):** package **Settings → Trusted Publisher → GitHub Actions** with Organization `almasix-dev`, Repository `starlight-theme`, Workflow `publish.yml` (Environment empty; allow `npm publish`).
 
-1. Open [npmjs.com/package/@almasix/starlight-theme](https://www.npmjs.com/package/@almasix/starlight-theme) → **Settings** → **Trusted Publisher**.
-2. Add **GitHub Actions** with exactly:
-
-   | Field | Value |
-   |-------|--------|
-   | Organization or user | `almasix-dev` |
-   | Repository | `starlight-theme` |
-   | Workflow filename | `publish.yml` |
-   | Environment | _(leave empty)_ |
-   | Allowed actions | enable **`npm publish`** |
-
-   Values are case-sensitive. npm does **not** validate them until the first CI publish.
-
-3. Optional hardening after the first successful CI publish: **Publishing access** → require 2FA and disallow classic tokens.
-
-### Release a new version
+**Release:**
 
 ```bash
-# 1. Bump version in package.json (must match the tag without "v")
-# 2. Commit, then:
+# Bump version in package.json so it matches the tag without "v"
 git tag v0.1.1
 git push origin main
 git push origin v0.1.1
 ```
 
-Pushing `v*` runs [`.github/workflows/publish.yml`](.github/workflows/publish.yml), which checks the tag matches `package.json` and runs `npm publish` via OIDC.
+Pushing `v*` runs [`.github/workflows/publish.yml`](.github/workflows/publish.yml).
 
 ## License
 
