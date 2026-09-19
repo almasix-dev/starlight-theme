@@ -1,0 +1,50 @@
+{
+  "name": "@almasix/starlight-theme",
+  "version": "0.1.0",
+  "description": "Almasix Starlight docs theme — cream paper, gruvbox code, GitHub chip, breadcrumb prev/next",
+  "type": "module",
+  "license": "MIT",
+  "author": "Almasix",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/almasix-dev/starlight-theme.git"
+  },
+  "homepage": "https://github.com/almasix-dev/starlight-theme#readme",
+  "bugs": {
+    "url": "https://github.com/almasix-dev/starlight-theme/issues"
+  },
+  "keywords": [
+    "astro",
+    "starlight",
+    "almasix",
+    "documentation",
+    "theme"
+  ],
+  "exports": {
+    ".": "./index.ts",
+    "./styles": "./styles/theme.css",
+    "./styles/theme.css": "./styles/theme.css",
+    "./components/*": "./components/*",
+    "./lib/*": "./lib/*",
+    "./scripts/*": "./scripts/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.ts",
+    "components",
+    "lib",
+    "scripts",
+    "styles",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "@astrojs/starlight": "^0.42.0",
+    "astro": "^5.0.0 || ^7.0.0"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
