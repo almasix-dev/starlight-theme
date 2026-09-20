@@ -14,9 +14,9 @@ const shouldRenderSearch =
 	config.pagefind || config.components.Search !== '@astrojs/starlight/components/Search.astro';
 
 const gh = await getGitHubStats(themeConfig.github);
-const hasStats =
-	Boolean(themeConfig.github) &&
-	(gh.release != null || gh.stars != null || gh.forks != null);
+// Always render the pill chip when a repo is configured — falling back to a
+// plain icon makes production look like stock Starlight when the GitHub API
+// is rate-limited (common on Cloudflare Workers Builds without a token).
 const showChip = Boolean(themeConfig.github);
 
 const githubIcon =
@@ -38,48 +38,35 @@ const forkIcon =
 		{
 			showChip && (
 				<div class="sl-flex social-icons">
-					{hasStats ? (
-						<div class="gh-chip" role="group" aria-label="GitHub repository">
-							{gh.release && (
-								<a class="gh-chip__part gh-chip__release" href={gh.releasesUrl}>
-									{gh.release}
-								</a>
-							)}
-							<a class="gh-chip__part" href={gh.repoUrl} title="GitHub stars">
-								<svg
-									aria-hidden="true"
-									width="14"
-									height="14"
-									viewBox="0 0 24 24"
-									fill="currentColor"
-									set:html={starIcon}
-								/>
-								<span>{gh.stars != null ? formatCount(gh.stars) : '—'}</span>
+					<div class="gh-chip" role="group" aria-label="GitHub repository">
+						{gh.release && (
+							<a class="gh-chip__part gh-chip__release" href={gh.releasesUrl}>
+								{gh.release}
 							</a>
-							<a class="gh-chip__part" href={`${gh.repoUrl}/forks`} title="GitHub forks">
-								<svg
-									aria-hidden="true"
-									width="14"
-									height="14"
-									viewBox="0 0 24 24"
-									fill="currentColor"
-									set:html={forkIcon}
-								/>
-								<span>{gh.forks != null ? formatCount(gh.forks) : '—'}</span>
-							</a>
-							<a class="gh-chip__part gh-chip__icon" href={gh.repoUrl} aria-label="GitHub">
-								<svg
-									aria-hidden="true"
-									width="16"
-									height="16"
-									viewBox="0 0 24 24"
-									fill="currentColor"
-									set:html={githubIcon}
-								/>
-							</a>
-						</div>
-					) : (
-						<a class="gh-fallback" href={gh.repoUrl} aria-label="GitHub">
+						)}
+						<a class="gh-chip__part" href={gh.repoUrl} title="GitHub stars">
+							<svg
+								aria-hidden="true"
+								width="14"
+								height="14"
+								viewBox="0 0 24 24"
+								fill="currentColor"
+								set:html={starIcon}
+							/>
+							<span>{gh.stars != null ? formatCount(gh.stars) : '—'}</span>
+						</a>
+						<a class="gh-chip__part" href={`${gh.repoUrl}/forks`} title="GitHub forks">
+							<svg
+								aria-hidden="true"
+								width="14"
+								height="14"
+								viewBox="0 0 24 24"
+								fill="currentColor"
+								set:html={forkIcon}
+							/>
+							<span>{gh.forks != null ? formatCount(gh.forks) : '—'}</span>
+						</a>
+						<a class="gh-chip__part gh-chip__icon" href={gh.repoUrl} aria-label="GitHub">
 							<svg
 								aria-hidden="true"
 								width="16"
@@ -89,7 +76,7 @@ const forkIcon =
 								set:html={githubIcon}
 							/>
 						</a>
-					)}
+					</div>
 				</div>
 			)
 		}
