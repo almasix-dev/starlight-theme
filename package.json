@@ -1,6 +1,6 @@
 {
   "name": "@almasix/starlight-theme",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Almasix Starlight docs theme — cream paper, gruvbox code, GitHub chip, breadcrumb prev/next",
   "type": "module",
   "license": "MIT",

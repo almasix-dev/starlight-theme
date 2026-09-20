@@ -10,14 +10,23 @@ export type GitHubStats = {
 
 const cache = new Map<string, GitHubStats>();
 
+function authHeaders(): Record<string, string> {
+	const headers: Record<string, string> = {
+		Accept: 'application/vnd.github+json',
+		'User-Agent': 'almasix-starlight-theme',
+		'X-GitHub-Api-Version': '2022-11-28',
+	};
+	// Cloudflare Workers Builds / GitHub Actions often rate-limit anonymous API.
+	const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
+	if (token) {
+		headers.Authorization = `Bearer ${token}`;
+	}
+	return headers;
+}
+
 async function fetchJson(url: string): Promise<unknown | null> {
 	try {
-		const res = await fetch(url, {
-			headers: {
-				Accept: 'application/vnd.github+json',
-				'User-Agent': 'almasix-starlight-theme',
-			},
-		});
+		const res = await fetch(url, { headers: authHeaders() });
 		if (!res.ok) return null;
 		return await res.json();
 	} catch {

@@ -119,7 +119,7 @@ Your `customCss`, `head`, and non-chrome `components` (e.g. `Hero`) are merged i
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `github` | — | `owner/repo` for the header chip (stars, forks, latest release) |
+| `github` | — | `owner/repo` for the header chip (stars, forks, latest release). Stats are fetched at build time; set `GITHUB_TOKEN` or `GH_TOKEN` in CI/Workers Builds so anonymous rate limits do not empty the chip. The pill chrome always renders when `github` is set. |
 | `product` | from Starlight `title` | Suffix next to the Almasix mark (`ORBIT`, `DOCS`, …) |
 | `hubUrl` | `https://almasix.com` | Wordmark link target |
 | `headerExtras` | — | Project-relative Astro component after the GitHub chip |
